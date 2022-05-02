@@ -1,15 +1,17 @@
 import express from "express";
 import config from "./config";
+import path from "path"
 import routesOne from "./routes/routes";;
 
 const app = express();
 
+// server port config
 app.set('port', config.port);
 
+//view engine config
+app.set('view engine', 'ejs');
+
 // Routes
-app.get("/", (req,res) => {
-    res.send("WELCOME");
-});
-app.use(routesOne);
+app.use('/', routesOne);
 
 export default app;
