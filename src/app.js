@@ -1,6 +1,5 @@
 import express from "express";
 import config from "./config";
-import path from "path"
 import routesOne from "./routes/routes";;
 
 const app = express();
