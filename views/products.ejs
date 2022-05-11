@@ -78,7 +78,7 @@
                           <td><%= results[i].ProductId %></td>
                           <td><%= results[i].Name %></td>
                           <td><%= results[i].ProductNumber %></td>
-                          <td><a href="/purchase" class="btn btn-danger">BUY</a></td>
+                          <td><a class="btn btn-danger" href="/product/<%=results[i].ProductId%>">BUY</a></td>
                         </tr>
                       <% } %>
                     <% } %>
