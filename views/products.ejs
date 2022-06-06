@@ -67,7 +67,7 @@
                     <tr>
                       <th scope="col"><h4>Product Id</h4></th>
                       <th scope="col"><h4>Name</h4></th>
-                      <th scope="col"><h4>Product Number</h4></th>
+                      <th scope="col"><h4>ListPrice</h4></th>
                       <th scope="col"><h4>Action</h4></th>
                     </tr>
                   </thead>
@@ -77,7 +77,7 @@
                         <tr class="table-active">
                           <td><%= results[i].ProductId %></td>
                           <td><%= results[i].Name %></td>
-                          <td><%= results[i].ProductNumber %></td>
+                          <td><%= results[i].ListPrice %></td>
                           <td><a class="btn btn-danger" href="/product/<%=results[i].ProductId%>">BUY</a></td>
                         </tr>
                       <% } %>

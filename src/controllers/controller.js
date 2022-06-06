@@ -6,7 +6,7 @@ export const initialPage = (req, res) => {
 
 export const getProducts = async (req,res) => {
     const pool = await getConnection();
-    const _query = "SELECT * FROM OPENQUERY(MYSQL, 'SELECT ProductId, Name, ProductNumber FROM adventureworks2019.product WHERE SellEndDate IS NULL')";
+    const _query = "SELECT * FROM OPENQUERY(MYSQL, 'SELECT ProductId, Name, ListPrice FROM adventureworks2019.product WHERE SellEndDate IS NULL AND ListPrice != 0.00')";
     const result = await pool.request().query(_query);
     //console.log({results:result.recordset});
     res.render('products', {results:result.recordset});
@@ -31,16 +31,22 @@ export const getProductInfo = async (req,res) => {
     
 }
 
-export const getAvailableProduct = async (req, res) => {
+export const managePurchaseData = async (req, res) => {
     const pool = await getConnection();
-    const _ProductID = req.params.idp;
-    const _query = "EXEC dbo.GetAvailableProduct '"+_ProductID+"'";
-    const result = await pool.request().query(_query);
-    if(result.recordset[0].SellEndDate == null){
-        //res.render('products');
-        //res.json('Producto disponible');
-    } else {
-        //res.render('products');
-        //res.json('Producto no disponible');
-    }
+    const _customerID = req.query.ClientID;
+    const _Quantity = req.query.Qty;
+    const _ProductID = req.query.ProductID;
+    const a = "SELECT PersonID FROM AdventureWorks2019_Sales.Sales.Customer WHERE CustomerID = "+_customerID+"";
+    const _SalesPersonID = await pool.request().query(a);
+    const b = "SELECT TerritoryID FROM AdventureWorks2019_Sales.Sales.Customer WHERE CustomerID = "+_customerID+"";
+    const c = "SELECT AddressID FROM SREMOTO1.AdventureWorks2019.Person.BusinessEntityAddress WHERE BusinessEntityID = "+_SalesPersonID.recordset[0].PersonID+"";
+    const d = "SELECT CreditCardID FROM AdventureWorks2019_Sales.Sales.PersonCreditCard WHERE BusinessEntityID = "+_SalesPersonID.recordset[0].PersonID+"";
+    const f = "SELECT * FROM OPENQUERY(MYSQL, 'SELECT ListPrice FROM adventureworks2019.product WHERE ProductId = "+_ProductID+"')";
+    const _TerritoryID = await pool.request().query(b);
+    const _AddressID = await pool.request().query(c);
+    const _CreditCardID = await pool.request().query(d);
+    const _SubTotal = await pool.request().query(f);
+    const _storedProcedure = "EXEC dbo.InsertOrderDetail "+_customerID+", "+_SalesPersonID.recordset[0].PersonID+", "+_TerritoryID.recordset[0].TerritoryID+", "+_AddressID.recordset[0].AddressID+", "+_CreditCardID.recordset[0].CreditCardID+", "+_SubTotal.recordset[0].ListPrice+", "+_Quantity+"";
+    const insert = await pool.request().query(_storedProcedure)
+    console.log(insert);
 }
