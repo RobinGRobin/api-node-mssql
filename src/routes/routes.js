@@ -4,7 +4,7 @@ import { managePurchaseData, getProductInfo, getProducts, initialPage } from "..
 
 const router = Router();
 
-router.get("/", initialPage)
+router.get("/", initialPage);
 router.get("/products", getProducts);
 router.get("/product/:idp", getProductInfo);
 router.get("/purchased-product", managePurchaseData);

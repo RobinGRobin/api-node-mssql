@@ -10,12 +10,14 @@
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
   <script type="text/javascript">
     $(document).ready(function() {
-      $("#btn-purchase").click(function (){
-        var idCustomer = $("#idCustomerObtained").val();
+      $("#comprar").click(function (){
+        var idCustomer = $("#idCustomerObtained").val(); 
         var purchaseQuantity = $("#purchaseQuantityObtained").val();
-
-        $("#idCustomerObtained2").val(idCustomer);
-
+        var url = "/purchased-product?ClientID="+idCustomer+"&Qty="+purchaseQuantity+"&ProductID="+<%=prod[0].ProductID%> +"";
+        var url2 = ' "'+url+'" '
+        const button = "<button type="+'"button"'+" class="+'"btn btn-success"'+" href="+url2+">Prepare</button>";
+        //alert(button);
+        $("#comprar").after("<a class="+'"btn btn-danger"'+" href="+url2+">BUY</a>");
       });
     });
   </script>
@@ -64,8 +66,10 @@
         <div class="col-lg-12 col-md-7- col-sm-6">
           <h3>Selected Product</h3>
           <p class="text-warning">
+
             <%= prod[0].Name %>
           </p>
+          <h5>There's no Special Offer for this product</h5>
         </div>
       </div>
     </div>
@@ -91,18 +95,9 @@
                   <input type="text" class="form-control" id="idCustomerObtained" placeholder="Enter ID">
                 </div>
                 <div class="form-group">
-                  <label for="exampleInputEmail1" class="form-label mt-4">ID Customer Obtained</label>
-                  <input type="text" class="form-control" id="idCustomerObtained2" placeholder="Enter ID">
-                </div>
-                <div class="form-group">
                   <label class="col-form-label mt-4" for="inputDefault"></label>
                   <!-- define el body de la petición para realizar la compra -->
-                  <% const purchaseData = { %>
-                    <% ClientID: idCustomer, %>
-                    <% Qty: purchaseQuantity,
-                    <%= ProductID: prod[0].Name %>
-                  <% }; %>
-                  <button id="btn-purchase" type="button" class="btn btn-success" href="">Success</button>
+                  <button type="button" class="btn btn-success" id="comprar">Prepare</button>
                 </div>
               </fieldset>
             </form>

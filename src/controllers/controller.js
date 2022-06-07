@@ -16,17 +16,26 @@ export const getProductInfo = async (req,res) => {
     const pool = await getConnection();
     const _ProductID = req.params.idp;
     const _query = "EXEC dbo.CheckAvailablePurchase'"+_ProductID+"'";   // check if there's a special offer
-    const _query2 = "SELECT * FROM OPENQUERY(MYSQL, 'SELECT Name FROM adventureworks2019.product WHERE ProductId = "+_ProductID+"')";  // getting the name of the product
+    const _query2 = "SELECT * FROM OPENQUERY(MYSQL, 'SELECT ProductID, Name FROM adventureworks2019.product WHERE ProductId = "+_ProductID+"')";  // getting the name of the product
     const result = await pool.request().query(_query);
     const result2 = await pool.request().query(_query2);
-    console.log(result.rowsAffected);
+    //console.log(result);
+    //console.log(result2);
+    //console.log(result.recordset[0].Description);
+    //console.log(result2);
     if(result.rowsAffected == 0){
         console.log('no special offer');
         res.render('purchaseNp',{prod:result2.recordset});
     } else {
-        console.log('there is a special offer');
-        res.render('purchase',{ results:result.recordset,
-                                prod: result2.recordset});
+        if(result.recordset[0].Description == 'No Discount'){
+            console.log('no special offer');
+            res.render('purchaseNp',{prod:result2.recordset});
+        } else {
+            console.log('there is a special offer');
+            res.render('purchase',{ results:result.recordset,
+                                    prod: result2.recordset});
+        }
+        
     }
     
 }
@@ -42,11 +51,21 @@ export const managePurchaseData = async (req, res) => {
     const c = "SELECT AddressID FROM SREMOTO1.AdventureWorks2019.Person.BusinessEntityAddress WHERE BusinessEntityID = "+_SalesPersonID.recordset[0].PersonID+"";
     const d = "SELECT CreditCardID FROM AdventureWorks2019_Sales.Sales.PersonCreditCard WHERE BusinessEntityID = "+_SalesPersonID.recordset[0].PersonID+"";
     const f = "SELECT * FROM OPENQUERY(MYSQL, 'SELECT ListPrice FROM adventureworks2019.product WHERE ProductId = "+_ProductID+"')";
+    const g = "SELECT MAX(SalesOrderID) AS ID FROM AdventureWorks2019_Sales.Sales.SalesOrderHeader"
     const _TerritoryID = await pool.request().query(b);
     const _AddressID = await pool.request().query(c);
     const _CreditCardID = await pool.request().query(d);
     const _SubTotal = await pool.request().query(f);
-    const _storedProcedure = "EXEC dbo.InsertOrderDetail "+_customerID+", "+_SalesPersonID.recordset[0].PersonID+", "+_TerritoryID.recordset[0].TerritoryID+", "+_AddressID.recordset[0].AddressID+", "+_CreditCardID.recordset[0].CreditCardID+", "+_SubTotal.recordset[0].ListPrice+", "+_Quantity+"";
+    const _LastID = await pool.request().query(g);
+    console.log(_LastID)
+    const _storedProcedure = "EXEC dbo.InsertOrderDetail "+(_LastID.recordset[0].ID)+", "+_customerID+", "+_SalesPersonID.recordset[0].PersonID+", "+_TerritoryID.recordset[0].TerritoryID+", "+_AddressID.recordset[0].AddressID+", "+_CreditCardID.recordset[0].CreditCardID+", "+_SubTotal.recordset[0].ListPrice+", "+_Quantity+"";
     const insert = await pool.request().query(_storedProcedure)
     console.log(insert);
+
+    const _query2 = "SELECT * FROM OPENQUERY(MYSQL, 'SELECT ProductID, Name FROM adventureworks2019.product WHERE ProductId = "+_ProductID+"')";
+    const toRender = await pool.request().query(_query2)
+
+    console.log(toRender)
+
+    res.render('purchasedProduct',{prod: toRender.recordset});
 }
