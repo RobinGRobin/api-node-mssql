@@ -19,7 +19,7 @@ export const getProductInfo = async (req,res) => {
     const _query2 = "SELECT * FROM OPENQUERY(MYSQL, 'SELECT ProductID, Name FROM adventureworks2019.product WHERE ProductId = "+_ProductID+"')";  // getting the name of the product
     const result = await pool.request().query(_query);
     const result2 = await pool.request().query(_query2);
-    //console.log(result);
+    console.log(result);
     //console.log(result2);
     //console.log(result.recordset[0].Description);
     //console.log(result2);
@@ -27,7 +27,7 @@ export const getProductInfo = async (req,res) => {
         console.log('no special offer');
         res.render('purchaseNp',{prod:result2.recordset});
     } else {
-        if(result.recordset[0].Description == 'No Discount'){
+        if(result.rows == 'No Discount' && result.rowsAffected == 1){
             console.log('no special offer');
             res.render('purchaseNp',{prod:result2.recordset});
         } else {
